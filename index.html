@@ -5,18 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Beach Trip Slideshow</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #a1c4fd, #c2e9fb);
+      background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #a1c4fd, #c2e9fb);
+      background-size: 400% 400%;
+      animation: gradientFlow 15s ease infinite;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
+    }
+
+    @keyframes gradientFlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
     .slideshow-container {
@@ -25,15 +31,24 @@
       max-width: 800px;
       overflow: hidden;
       border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
     }
 
     .slide {
-      display: none;
       position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
-      height: 100%;
-      animation: zoomFade 1.5s ease-in-out;
+      opacity: 0;
+      transform: scale(1.05);
+      transition: opacity 1.2s ease, transform 1.2s ease;
+      z-index: 0;
+    }
+
+    .slide.show {
+      opacity: 1;
+      transform: scale(1);
+      z-index: 1;
     }
 
     .slide img {
@@ -43,30 +58,20 @@
       border-radius: 16px;
     }
 
-    @keyframes zoomFade {
-      0% {
-        opacity: 0;
-        transform: scale(1.1);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-
     .dots {
       position: absolute;
       bottom: 12px;
       width: 100%;
       text-align: center;
+      z-index: 2;
     }
 
     .dot {
       cursor: pointer;
-      height: 12px;
-      width: 12px;
-      margin: 0 4px;
-      background-color: rgba(255, 255, 255, 0.7);
+      height: 10px;
+      width: 10px;
+      margin: 0 3px;
+      background-color: rgba(255, 255, 255, 0.6);
       border-radius: 50%;
       display: inline-block;
       transition: background-color 0.3s;
@@ -79,33 +84,47 @@
 </head>
 <body>
 
-<div class="slideshow-container">
-  <div class="slide">
-    <img src="images/beach1.jpeg" alt="Beach 1">
-  </div>
-
-  <div class="dots">
-    <span class="dot" onclick="setSlide(0)"></span>
-    <span class="dot" onclick="setSlide(1)"></span>
-    <span class="dot" onclick="setSlide(2)"></span>
-  </div>
+<div class="slideshow-container" id="slideshow">
+  <div class="dots" id="dots"></div>
 </div>
 
 <script>
-  const slides = document.querySelectorAll(".slide");
-  const dots = document.querySelectorAll(".dot");
+  const imageCount = 80;
+  const slideshow = document.getElementById("slideshow");
+  const dotsContainer = document.getElementById("dots");
+
+  const slides = [];
+  const dots = [];
   let current = 0;
-  let slideInterval;
+  let interval;
+
+  // Preload images and build slides
+  for (let i = 1; i <= imageCount; i++) {
+    const img = new Image();
+    img.src = `beach${i}.jpeg`;
+
+    const slide = document.createElement("div");
+    slide.className = "slide";
+    slide.appendChild(img);
+    slideshow.insertBefore(slide, dotsContainer);
+    slides.push(slide);
+
+    const dot = document.createElement("span");
+    dot.className = "dot";
+    dot.onclick = () => setSlide(i - 1);
+    dotsContainer.appendChild(dot);
+    dots.push(dot);
+  }
 
   function showSlide(index) {
-    slides.forEach((s, i) => {
-      s.style.display = i === index ? "block" : "none";
+    slides.forEach((slide, i) => {
+      slide.classList.toggle("show", i === index);
       dots[i].classList.toggle("active", i === index);
     });
   }
 
   function nextSlide() {
-    current = (current + 1) % slides.length;
+    current = (current + 1) % imageCount;
     showSlide(current);
   }
 
@@ -116,12 +135,13 @@
   }
 
   function resetInterval() {
-    clearInterval(slideInterval);
-    slideInterval = setInterval(nextSlide, 4000);
+    clearInterval(interval);
+    interval = setInterval(nextSlide, 4000);
   }
 
+  // Start
   showSlide(current);
-  slideInterval = setInterval(nextSlide, 4000);
+  interval = setInterval(nextSlide, 4000);
 </script>
 
 </body>
