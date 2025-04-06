@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Beach Trip Slideshow</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #a1c4fd, #c2e9fb);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .slideshow-container {
+      position: relative;
+      width: 90%;
+      max-width: 800px;
+      overflow: hidden;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    .slide {
+      display: none;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      animation: zoomFade 1.5s ease-in-out;
+    }
+
+    .slide img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 16px;
+    }
+
+    @keyframes zoomFade {
+      0% {
+        opacity: 0;
+        transform: scale(1.1);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .dots {
+      position: absolute;
+      bottom: 12px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .dot {
+      cursor: pointer;
+      height: 12px;
+      width: 12px;
+      margin: 0 4px;
+      background-color: rgba(255, 255, 255, 0.7);
+      border-radius: 50%;
+      display: inline-block;
+      transition: background-color 0.3s;
+    }
+
+    .dot.active {
+      background-color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+<div class="slideshow-container">
+  <div class="slide">
+    <img src="images/beach1.jpeg" alt="Beach 1">
+  </div>
+
+  <div class="dots">
+    <span class="dot" onclick="setSlide(0)"></span>
+    <span class="dot" onclick="setSlide(1)"></span>
+    <span class="dot" onclick="setSlide(2)"></span>
+  </div>
+</div>
+
+<script>
+  const slides = document.querySelectorAll(".slide");
+  const dots = document.querySelectorAll(".dot");
+  let current = 0;
+  let slideInterval;
+
+  function showSlide(index) {
+    slides.forEach((s, i) => {
+      s.style.display = i === index ? "block" : "none";
+      dots[i].classList.toggle("active", i === index);
+    });
+  }
+
+  function nextSlide() {
+    current = (current + 1) % slides.length;
+    showSlide(current);
+  }
+
+  function setSlide(index) {
+    current = index;
+    showSlide(current);
+    resetInterval();
+  }
+
+  function resetInterval() {
+    clearInterval(slideInterval);
+    slideInterval = setInterval(nextSlide, 4000);
+  }
+
+  showSlide(current);
+  slideInterval = setInterval(nextSlide, 4000);
+</script>
+
+</body>
+</html>
